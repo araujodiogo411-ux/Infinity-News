@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, DollarSign, TrendingUp, Sparkles, Check, RefreshCw, ShieldCheck } from 'lucide-react';
 import { FinancialQuotes } from '../types/news';
+import { saveQuotesToFirestore } from '../services/quotesService';
 
 interface AdminQuotesModalProps {
   isOpen: boolean;
@@ -100,28 +101,23 @@ export const AdminQuotesModal: React.FC<AdminQuotesModalProps> = ({
     };
 
     try {
-      const res = await fetch('/api/financial-quotes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (data.success) {
-        onQuotesUpdated({
-          ...currentQuotes,
-          ...payload,
-          updatedAt: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-          source: 'Alterado pelo Administrador'
-        } as FinancialQuotes);
+      // 1. Save directly to Cloud Firestore Database
+      await saveQuotesToFirestore(payload as any);
 
-        setSuccessMsg('Cotações de Dólar, Euro, PIB e Cripto salvas com sucesso em todo o portal!');
-        setTimeout(() => {
-          onClose();
-        }, 800);
-      }
+      onQuotesUpdated({
+        ...currentQuotes,
+        ...payload,
+        updatedAt: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        source: 'Salvo no Banco Firestore Real'
+      } as FinancialQuotes);
+
+      setSuccessMsg('Cotações de Dólar, Euro, PIB e Criptomoedas salvas com sucesso no Banco Firestore!');
+      setTimeout(() => {
+        onClose();
+      }, 900);
     } catch (err: any) {
       console.error(err);
-      setSuccessMsg('Erro ao salvar cotações: ' + err.message);
+      setSuccessMsg('Erro ao salvar cotações no banco de dados: ' + err.message);
     } finally {
       setIsSaving(false);
     }

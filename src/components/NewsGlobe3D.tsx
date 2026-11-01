@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { StreetExplorer3DModal } from './StreetExplorer3DModal';
 import { BrasiliaStreetTourModal } from './BrasiliaStreetTourModal';
+import { subscribeToQuotes, getQuotesFromFirestore } from '../services/quotesService';
 
 interface CapitalPoint {
   name: string;
@@ -58,6 +59,61 @@ const WORLD_CAPITALS: CapitalPoint[] = [
   { name: 'Cairo', country: 'Egito', lat: 30.04, lng: 31.23, population: '10,0 mi', status: 'Canal de Suez moderniza sistema de tráfego naval bioceânico' },
   { name: 'Camberra', country: 'Austrália', lat: -35.28, lng: 149.13, population: '450 mil', status: 'Exportação de minérios raros para baterias bate recorde' },
   { name: 'Ottawa', country: 'Canadá', lat: 45.42, lng: -75.69, population: '1,0 mi', status: 'Parceria no Ártico para proteção climática e rotas limpas' },
+  { name: 'Madri', country: 'Espanha', lat: 40.41, lng: -3.70, population: '3,3 mi', status: 'Hub de energia solar e conexões com a América Latina' },
+  { name: 'Lisboa', country: 'Portugal', lat: 38.72, lng: -9.13, population: '545 mil', status: 'Polo europeu de inovação digital e startups oceânicas' },
+  { name: 'Moscou', country: 'Rússia', lat: 55.75, lng: 37.61, population: '13,0 mi', status: 'Comércio euroasiático de gás natural e trigo' },
+  { name: 'Riade', country: 'Arábia Saudita', lat: 24.71, lng: 46.67, population: '7,6 mi', status: 'Investimentos em transição energética e projetos desérticos' },
+  { name: 'Seul', country: 'Coreia do Sul', lat: 37.56, lng: 126.97, population: '9,7 mi', status: 'Liderança global em semicondutores e baterias elétricas' }
+];
+
+export interface GeoSpherePoint {
+  name: string;
+  category: 'capital' | 'amazonia' | 'aquatico' | 'pais';
+  lat: number;
+  lng: number;
+  info: string;
+  isBrasilia?: boolean;
+}
+
+export const AMAZON_TERRITORIES: GeoSpherePoint[] = [
+  { name: 'Manaus (AM)', category: 'amazonia', lat: -3.11, lng: -60.02, info: 'Coração da Amazônia Ocidental e Polo Industrial Sustentável' },
+  { name: 'Belém (PA)', category: 'amazonia', lat: -1.45, lng: -48.50, info: 'Portal da Amazônia Oriental & Sede da COP30' },
+  { name: 'Santarém (PA)', category: 'amazonia', lat: -2.44, lng: -54.70, info: 'Encontro das águas dos Rios Tapajós e Amazonas' },
+  { name: 'Macapá (AP)', category: 'amazonia', lat: 0.03, lng: -51.06, info: 'Linha do Equador e foz setentrional do Rio Amazonas' },
+  { name: 'Boa Vista (RR)', category: 'amazonia', lat: 2.82, lng: -60.67, info: 'Extremo norte da Amazônia e bacia do Rio Branco' },
+  { name: 'Rio Branco (AC)', category: 'amazonia', lat: -9.97, lng: -67.82, info: 'Reserva Extrativista Chico Mendes & Fronteira Andina' },
+  { name: 'Porto Velho (RO)', category: 'amazonia', lat: -8.76, lng: -63.90, info: 'Bacia do Rio Madeira & Corredor de Biodiversidade' },
+  { name: 'Tefé (AM)', category: 'amazonia', lat: -3.35, lng: -64.71, info: 'Reserva de Desenvolvimento Sustentável Mamirauá' },
+  { name: 'Parque Nacional do Jaú', category: 'amazonia', lat: -2.15, lng: -62.50, info: 'Maior parque contínuo de floresta tropical do planeta' },
+  { name: 'Território Yanomami', category: 'amazonia', lat: 2.50, lng: -63.50, info: 'Maior terra indígena demarcada do Brasil' },
+  { name: 'Parque Indígena do Xingu (MT)', category: 'amazonia', lat: -11.50, lng: -53.20, info: 'Território histórico de preservação étnica e biológica' },
+  { name: 'Floresta Nacional do Tapajós', category: 'amazonia', lat: -3.05, lng: -55.00, info: 'Unidade de conservação pioneira em manejo sustentável' }
+];
+
+export const TERRITORIAL_WATERS: GeoSpherePoint[] = [
+  { name: 'Arquipélago São Pedro e São Paulo', category: 'aquatico', lat: 0.92, lng: -29.35, info: 'Extremo oceânico da Amazônia Azul Brasileira' },
+  { name: 'Fernando de Noronha & Atol das Rocas', category: 'aquatico', lat: -3.85, lng: -32.42, info: 'Santuário biológico marinho e patrimônio natural' },
+  { name: 'Ilhas Trindade e Martim Vaz', category: 'aquatico', lat: -20.52, lng: -29.32, info: 'Posto avançado marítimo do Brasil no Atlântico Sul' },
+  { name: 'Foz Marítima do Amazonas', category: 'aquatico', lat: 1.50, lng: -48.00, info: 'Maior descarga de água doce nos oceanos do mundo' },
+  { name: 'Bacia de Santos (Pré-Sal)', category: 'aquatico', lat: -25.00, lng: -44.00, info: 'Maior reserva energética e tecnológica submarina nacional' },
+  { name: 'Bacia de Campos (RJ)', category: 'aquatico', lat: -22.50, lng: -40.50, info: 'Polo pioneiro de produção oceânica em águas profundas' },
+  { name: 'Plataforma Recife & Suape (PE)', category: 'aquatico', lat: -8.30, lng: -34.70, info: 'Complexo portuário estratégico e águas territoriais do Nordeste' },
+  { name: 'Águas Territoriais do Chuí (RS)', category: 'aquatico', lat: -33.75, lng: -53.00, info: 'Limite marítimo meridional do território brasileiro' }
+];
+
+export const COUNTRY_BALLS: GeoSpherePoint[] = [
+  { name: 'Brasil', category: 'pais', lat: -14.23, lng: -51.92, info: 'Maior nação da América do Sul e liderança na transição verde' },
+  { name: 'Estados Unidos', category: 'pais', lat: 37.09, lng: -95.71, info: 'Polo global de economia, tecnologia e pesquisa aeroespacial' },
+  { name: 'Canadá', category: 'pais', lat: 56.13, lng: -106.34, info: 'Território boreal com vastas reservas de água doce e minérios' },
+  { name: 'França', category: 'pais', lat: 46.22, lng: 2.21, info: 'Eixo central da União Europeia e tecnologia aeroespacial' },
+  { name: 'Reino Unido', category: 'pais', lat: 55.37, lng: -3.43, info: 'Polo financeiro e berço da inovação científica' },
+  { name: 'Alemanha', category: 'pais', lat: 51.16, lng: 10.45, info: 'Líder industrial europeia e pioneira em sustentabilidade' },
+  { name: 'Japão', category: 'pais', lat: 36.20, lng: 138.25, info: 'Liderança global em robótica, semicondutores e alta tecnologia' },
+  { name: 'China', category: 'pais', lat: 35.86, lng: 104.19, info: 'Segunda maior economia global e pioneira em transição solar' },
+  { name: 'Índia', category: 'pais', lat: 20.59, lng: 78.96, info: 'País mais populoso do mundo com forte crescimento em tecnologia' },
+  { name: 'África do Sul', category: 'pais', lat: -30.55, lng: 22.93, info: 'Maior polo econômico e mineral do continente africano' },
+  { name: 'Austrália', category: 'pais', lat: -25.27, lng: 133.77, info: 'Continente-ilha estratégico com abundância de recursos minerais' },
+  { name: 'Argentina', category: 'pais', lat: -38.41, lng: -63.61, info: 'Grande produtor agrícola global e parceiro chave no Mercosul' }
 ];
 
 /**
@@ -161,22 +217,39 @@ export const NewsGlobe3D: React.FC<NewsGlobe3DProps> = ({
   const targetRotationYRef = useRef<number | null>(null);
   const targetRotationXRef = useRef<number | null>(null);
 
-  // Fetch real-time live financial quotes
+  // Fetch real-time live financial quotes from Firestore and API fallback
   useEffect(() => {
+    // 1. Initial from Firestore
+    getQuotesFromFirestore().then(q => {
+      if (q) setQuotes(q);
+    }).catch(() => {});
+
+    // 2. Real-time Firestore subscription
+    const unsubscribe = subscribeToQuotes((liveQuotes) => {
+      if (liveQuotes) {
+        setQuotes(liveQuotes);
+      }
+    });
+
+    // 3. Fallback to API
     const fetchLiveQuotes = async () => {
       try {
         const res = await fetch('/api/financial-quotes');
         const data = await res.json();
         if (data.success && data.quotes) {
-          setQuotes(data.quotes);
+          setQuotes((prev: any) => ({ ...prev, ...data.quotes }));
         }
       } catch (err) {
         console.warn('Error fetching quotes in Globe:', err);
       }
     };
     fetchLiveQuotes();
-    const interval = setInterval(fetchLiveQuotes, 30000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchLiveQuotes, 45000);
+
+    return () => {
+      clearInterval(interval);
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -419,27 +492,32 @@ export const NewsGlobe3D: React.FC<NewsGlobe3DProps> = ({
     ], 0xf59e0b, 1.022));
 
     // -------------------------------------------------------------
-    // 11. CAPITAL CITY PINS & BEACONS
+    // 11. GOLDEN CAPITALS, GREEN AMAZON, CYAN WATERS & COUNTRY SPHERES
     // -------------------------------------------------------------
     const pinsGroup = new THREE.Group();
     globeGroup.add(pinsGroup);
 
+    // 1. BOLAS DOURADAS NAS CAPITAIS (Gold 3D Spheres with dual radar halos)
     WORLD_CAPITALS.forEach((cap) => {
-      const pos = latLngToVector3(cap.lat, cap.lng, radius * 1.022, useGeoidModel);
+      const pos = latLngToVector3(cap.lat, cap.lng, radius * 1.026, useGeoidModel);
 
-      // Core point (Brasília is highlighted with gold & red)
-      const pinGeo = new THREE.SphereGeometry(cap.isBrasilia ? 1.8 : (cap.isBrazil ? 1.4 : 1.1), 16, 16);
-      const pinMat = new THREE.MeshBasicMaterial({
-        color: cap.isBrasilia ? 0xfacc15 : (cap.isBrazil ? 0xef4444 : 0x38bdf8)
+      // Gold sphere geometry & material
+      const pinGeo = new THREE.SphereGeometry(cap.isBrasilia ? 2.5 : 1.7, 16, 16);
+      const pinMat = new THREE.MeshStandardMaterial({
+        color: 0xffd700, // Vibrant Gold
+        emissive: 0xb45309,
+        roughness: 0.15,
+        metalness: 0.9,
       });
       const pin = new THREE.Mesh(pinGeo, pinMat);
       pin.position.copy(pos);
+      pin.userData = { type: 'capital', data: cap };
       pinsGroup.add(pin);
 
-      // Radar beacon ring
-      const ringGeo = new THREE.RingGeometry(cap.isBrasilia ? 2.2 : 1.6, cap.isBrasilia ? 3.4 : 2.4, 24);
+      // Pulsing gold radar beacon ring
+      const ringGeo = new THREE.RingGeometry(cap.isBrasilia ? 2.8 : 2.0, cap.isBrasilia ? 4.2 : 3.0, 24);
       const ringMat = new THREE.MeshBasicMaterial({
-        color: cap.isBrasilia ? 0xfde047 : (cap.isBrazil ? 0xf87171 : 0x0ea5e9),
+        color: 0xfde047,
         side: THREE.DoubleSide,
         transparent: true,
         opacity: 0.85
@@ -448,6 +526,83 @@ export const NewsGlobe3D: React.FC<NewsGlobe3DProps> = ({
       ring.position.copy(pos);
       ring.lookAt(new THREE.Vector3(0, 0, 0));
       pinsGroup.add(ring);
+    });
+
+    // 2. BOLAS VERDES NAS ÁREAS AMAZÔNICAS E TERRITÓRIOS (Emerald Green 3D Spheres)
+    AMAZON_TERRITORIES.forEach((amz) => {
+      const pos = latLngToVector3(amz.lat, amz.lng, radius * 1.028, useGeoidModel);
+
+      const amzGeo = new THREE.SphereGeometry(1.8, 16, 16);
+      const amzMat = new THREE.MeshStandardMaterial({
+        color: 0x10b981, // Vibrant Emerald Green
+        emissive: 0x059669,
+        roughness: 0.2,
+        metalness: 0.7,
+      });
+      const amzMesh = new THREE.Mesh(amzGeo, amzMat);
+      amzMesh.position.copy(pos);
+      amzMesh.userData = { type: 'amazonia', data: amz };
+      pinsGroup.add(amzMesh);
+
+      // Green beacon ring
+      const amzRingGeo = new THREE.RingGeometry(2.1, 3.2, 20);
+      const amzRingMat = new THREE.MeshBasicMaterial({
+        color: 0x34d399,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.8
+      });
+      const amzRing = new THREE.Mesh(amzRingGeo, amzRingMat);
+      amzRing.position.copy(pos);
+      amzRing.lookAt(new THREE.Vector3(0, 0, 0));
+      pinsGroup.add(amzRing);
+    });
+
+    // 3. BOLAS CIANO/AZUL NAS ÁGUAS TERRITORIAIS (Cyan/Aquamarine 3D Spheres)
+    TERRITORIAL_WATERS.forEach((water) => {
+      const pos = latLngToVector3(water.lat, water.lng, radius * 1.018, useGeoidModel);
+
+      const waterGeo = new THREE.SphereGeometry(1.6, 16, 16);
+      const waterMat = new THREE.MeshStandardMaterial({
+        color: 0x06b6d4, // Cyan / Ocean Blue
+        emissive: 0x0891b2,
+        roughness: 0.1,
+        metalness: 0.85,
+      });
+      const waterMesh = new THREE.Mesh(waterGeo, waterMat);
+      waterMesh.position.copy(pos);
+      waterMesh.userData = { type: 'aquatico', data: water };
+      pinsGroup.add(waterMesh);
+
+      // Cyan wave ring
+      const waterRingGeo = new THREE.RingGeometry(1.9, 2.9, 20);
+      const waterRingMat = new THREE.MeshBasicMaterial({
+        color: 0x67e8f9,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85
+      });
+      const waterRing = new THREE.Mesh(waterRingGeo, waterRingMat);
+      waterRing.position.copy(pos);
+      waterRing.lookAt(new THREE.Vector3(0, 0, 0));
+      pinsGroup.add(waterRing);
+    });
+
+    // 4. BOLAS EM CADA PAÍS (Country 3D Spheres)
+    COUNTRY_BALLS.forEach((country) => {
+      const pos = latLngToVector3(country.lat, country.lng, radius * 1.020, useGeoidModel);
+
+      const cGeo = new THREE.SphereGeometry(1.4, 16, 16);
+      const cMat = new THREE.MeshStandardMaterial({
+        color: 0xf87171,
+        emissive: 0xb91c1c,
+        roughness: 0.25,
+        metalness: 0.7,
+      });
+      const cMesh = new THREE.Mesh(cGeo, cMat);
+      cMesh.position.copy(pos);
+      cMesh.userData = { type: 'pais', data: country };
+      pinsGroup.add(cMesh);
     });
 
     // 12. Lighting Setup
@@ -706,18 +861,22 @@ export const NewsGlobe3D: React.FC<NewsGlobe3DProps> = ({
             />
 
             {/* Floating Legends */}
-            <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2 pointer-events-none">
-              <span className="bg-amber-950/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] text-amber-300 border border-amber-500/40 flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-amber-400" />
-                Brasília DF (Ponto Dourado)
+            <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5 pointer-events-none max-w-xl">
+              <span className="bg-amber-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] text-amber-300 border border-amber-500/50 flex items-center gap-1 font-bold shadow">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                🟡 Bolas Douradas: Capitais Mundiais (Brasília em destaque)
               </span>
-              <span className="bg-emerald-950/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+              <span className="bg-emerald-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] text-emerald-300 border border-emerald-500/50 flex items-center gap-1 font-bold shadow">
                 <Trees className="w-3 h-3 text-emerald-400" />
-                Bioma Amazônia
+                🟢 Bolas Verdes: Áreas Amazônicas & Territórios
               </span>
-              <span className="bg-cyan-950/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] text-cyan-300 border border-cyan-500/40 flex items-center gap-1">
+              <span className="bg-cyan-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] text-cyan-300 border border-cyan-500/50 flex items-center gap-1 font-bold shadow">
                 <Waves className="w-3 h-3 text-cyan-400" />
-                Águas Territoriais
+                🔵 Bolas Ciano: Águas Territoriais (Amazônia Azul)
+              </span>
+              <span className="bg-red-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] text-red-300 border border-red-500/50 flex items-center gap-1 font-bold shadow">
+                <Globe className="w-3 h-3 text-red-400" />
+                🔴 Bolas dos Países
               </span>
             </div>
 

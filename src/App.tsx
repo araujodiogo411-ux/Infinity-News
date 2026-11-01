@@ -21,6 +21,7 @@ import {
   permanentDeleteInFirestore,
   seedFirestoreIfEmpty 
 } from './services/articleService';
+import { subscribeToQuotes, getQuotesFromFirestore } from './services/quotesService';
 
 export default function App() {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
@@ -163,6 +164,25 @@ export default function App() {
       }
     };
   }, [selectedCategory, searchQuery, isAdmin]);
+
+  // Real-time Firestore quotes synchronization
+  useEffect(() => {
+    getQuotesFromFirestore().then((initialQuotes) => {
+      if (initialQuotes) setCurrentQuotes(initialQuotes);
+    }).catch(err => console.warn('[App] Quotes firestore init error:', err));
+
+    const unsubscribeQuotes = subscribeToQuotes((liveQuotes) => {
+      if (liveQuotes) {
+        setCurrentQuotes(liveQuotes);
+      }
+    });
+
+    return () => {
+      if (typeof unsubscribeQuotes === 'function') {
+        unsubscribeQuotes();
+      }
+    };
+  }, []);
 
   // Admin Handlers
   const handleAdminLoginSuccess = () => {
@@ -308,6 +328,7 @@ export default function App() {
         onOpenBrasiliaTour={() => setShowBrasiliaTour(true)}
         onOpenTrash={() => setShowTrashModal(true)}
         trashCount={trashArticles.length}
+        currentQuotes={currentQuotes}
       />
 
       {/* Main Content Area */}

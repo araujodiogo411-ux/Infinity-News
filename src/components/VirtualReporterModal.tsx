@@ -24,7 +24,9 @@ import {
   Eye,
   FileText,
   Sliders,
-  Maximize2
+  Maximize2,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
 import { NewsArticle } from '../types/news';
 import { FifineMascot3D } from './FifineMascot3D';
@@ -83,12 +85,25 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
   const [currentlyPlayingUserAudioId, setCurrentlyPlayingUserAudioId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const chatScrollRef = useRef<HTMLDivElement | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
   const userAudioPlayerRef = useRef<HTMLAudioElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordTimerRef = useRef<any>(null);
+
+  const scrollToTop = () => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   // Initialize Speech Synthesis for Fifine's voice
   const speakWithFifineVoice = (text: string, msgId: string) => {
@@ -394,7 +409,7 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
   const latestAssistantMessage = [...messages].reverse().find(m => m.sender === 'assistant');
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-fadeIn">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-fadeIn">
       
       {/* Hidden Audio Players */}
       <audio
@@ -442,21 +457,21 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
       )}
 
       {/* Main Studio Card */}
-      <div className="bg-[#0b1329] rounded-3xl shadow-2xl max-w-5xl w-full flex flex-col h-[92vh] overflow-hidden border border-slate-700/80 text-white my-auto relative">
+      <div className="bg-[#0b1329] rounded-3xl shadow-2xl max-w-6xl w-full flex flex-col h-[94vh] max-h-[94vh] overflow-hidden border border-slate-700/80 text-white my-auto relative">
         
         {/* Top Professional Header Bar */}
-        <div className="bg-gradient-to-r from-slate-950 via-[#131d35] to-slate-950 px-5 py-3.5 flex items-center justify-between border-b border-slate-800">
+        <div className="bg-gradient-to-r from-slate-950 via-[#131d35] to-slate-950 px-5 py-3 flex items-center justify-between border-b border-slate-800 shrink-0">
           <div className="flex items-center space-x-3.5">
             <div className="relative">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#C4170C] via-red-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-red-500/25 font-black text-lg border border-white/20">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#C4170C] via-red-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-red-500/25 font-black text-base border border-white/20">
                 F
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#0b1329]" title="Ao Vivo na Bancada" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0b1329]" title="Ao Vivo na Bancada" />
             </div>
 
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-black text-base sm:text-lg tracking-tight text-white flex items-center gap-1.5">
+                <h3 className="font-black text-base tracking-tight text-white flex items-center gap-1.5">
                   <span>Repórter Fifine</span>
                   <span className="text-[10px] text-amber-300 font-mono tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-400/40 font-bold">
                     F • I • N • I • F • I
@@ -464,11 +479,11 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
                 </h3>
                 <span className="bg-red-500/20 text-red-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-500/40 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-                  Âncora Sênior
+                  Responde Tudo
                 </span>
               </div>
               <p className="text-xs text-slate-300 flex items-center gap-1">
-                <span>Investigação Editorial & Perícia Multimodal de Fotos e Voz</span>
+                <span>Pergunte qualquer coisa (notícias, fotos, áudios ou curiosidades)</span>
                 <span>•</span>
                 <button
                   type="button"
@@ -518,9 +533,9 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
           </div>
         </div>
 
-        {/* EXPANDABLE PROFESSIONAL PROFILE DOSSIER (User requested detailed & professional characteristics) */}
+        {/* EXPANDABLE PROFESSIONAL PROFILE DOSSIER */}
         {showDossier && (
-          <div className="bg-slate-950/95 border-b border-amber-500/30 p-4 sm:p-5 z-20 animate-fadeIn">
+          <div className="bg-slate-950/95 border-b border-amber-500/30 p-4 sm:p-5 z-20 animate-fadeIn shrink-0">
             <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
               
               <div className="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-800 space-y-1.5">
@@ -529,7 +544,7 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
                   <span>Credenciais Editoriais</span>
                 </div>
                 <p className="text-slate-200 leading-relaxed">
-                  Âncora digital do portal INFINITY, treinado com diretrizes de verificação rigorosa de fatos, perícia de imagens e neutralidade investigativa.
+                  Âncora digital do portal INFINITY, apto a responder qualquer tema da humanidade, checar imagens, áudios e dados em tempo real.
                 </p>
                 <div className="pt-1 flex flex-wrap gap-1">
                   <span className="bg-slate-800 px-2 py-0.5 rounded text-[10px] text-amber-300">IFCN Standard</span>
@@ -543,9 +558,9 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
                   <span>Especialidades & Perícia</span>
                 </div>
                 <ul className="text-slate-300 space-y-1">
-                  <li>• <strong>Perícia Fotográfica:</strong> Análise de objetos, documentos e autenticidade.</li>
+                  <li>• <strong>Perícia Fotográfica:</strong> Análise de fotos, objetos e documentos.</li>
                   <li>• <strong>Mercado Financeiro:</strong> Dólar, Euro, PIB e 17.480+ criptomoedas.</li>
-                  <li>• <strong>Cobertura Regional:</strong> Pernambuco, São Paulo, Brasília e capitais.</li>
+                  <li>• <strong>Conhecimento Livre:</strong> Responde qualquer dúvida ou curiosidade.</li>
                 </ul>
               </div>
 
@@ -555,7 +570,7 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
                   <span>Diretriz de Comunicação</span>
                 </div>
                 <p className="text-slate-200 leading-relaxed italic">
-                  "Informação fundamentada com profundidade, vocabulário refinado e respostas completas para o público exigente do INFINITY."
+                  "Informação fundamentada com profundidade, vocabulário refinado e respostas completas para o público do INFINITY."
                 </p>
                 <p className="text-[10px] text-slate-400 pt-1">
                   Capacidade de análise multimodal de voz e fotos em alta definição ativa.
@@ -568,7 +583,7 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
 
         {/* Current Active Article Banner if available */}
         {currentArticle && (
-          <div className="bg-red-950/50 border-b border-red-900/40 px-4 py-2 text-xs text-red-200 flex items-center justify-between">
+          <div className="bg-red-950/50 border-b border-red-900/40 px-4 py-2 text-xs text-red-200 flex items-center justify-between shrink-0">
             <span className="truncate font-medium flex items-center gap-1.5">
               <Radio className="w-3.5 h-3.5 text-red-400 animate-pulse" />
               <span>Pauta em tela: <strong className="text-white">{currentArticle.title}</strong></span>
@@ -579,59 +594,56 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
           </div>
         )}
 
-        {/* MAIN BODY: Mascot Stage (Left) + Interactive Multimodal Chat (Right) */}
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
+        {/* MAIN BODY: Mascot Stage (Left/Side) + Interactive Multimodal Chat (Right) */}
+        <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
           
-          {/* LEFT: 3D MASCOT STAGE (Professional Newsroom Anchor Studio) */}
-          <div className="md:col-span-5 bg-gradient-to-b from-slate-950 via-[#101931] to-slate-950 border-r border-slate-800 p-4 sm:p-5 flex flex-col items-center justify-between relative overflow-hidden">
+          {/* LEFT: 3D MASCOT STAGE (Always pinned on the side, NEVER scrolls away) */}
+          <div className="w-full md:w-80 lg:w-96 shrink-0 h-44 md:h-full bg-gradient-to-b from-slate-950 via-[#101931] to-slate-950 border-b md:border-b-0 md:border-r border-slate-800 p-3 sm:p-4 flex flex-col items-center justify-between relative overflow-hidden">
             
             {/* Ambient Lighting & Stage Lights */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* Stage Status Indicator */}
-            <div className="w-full flex items-center justify-between text-xs text-slate-300 z-10">
-              <span className="flex items-center gap-1.5 font-bold text-amber-300 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-400/30">
+            <div className="w-full flex items-center justify-between text-xs text-slate-300 z-10 shrink-0">
+              <span className="flex items-center gap-1.5 font-bold text-amber-300 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-400/30 text-[11px]">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                Mascote 3D em Alta Definição
+                Mascote Fixo ao Lado
               </span>
               {isSpeakingFifine ? (
-                <span className="bg-red-600/30 text-red-200 border border-red-500/50 px-2.5 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1 animate-pulse">
+                <span className="bg-red-600/30 text-red-200 border border-red-500/50 px-2 py-0.5 rounded-full text-[10px] font-black uppercase flex items-center gap-1 animate-pulse">
                   <Volume2 className="w-3 h-3 text-red-400" />
                   Falando no ar...
                 </span>
               ) : (
-                <span className="text-[11px] text-slate-400 bg-slate-900/60 px-2 py-0.5 rounded-full border border-slate-800">
-                  Pronto para análise
+                <span className="text-[10px] text-slate-400 bg-slate-900/60 px-2 py-0.5 rounded-full border border-slate-800">
+                  Pronto para responder
                 </span>
               )}
             </div>
 
             {/* 3D Mascot Center */}
-            <div className="relative my-2 sm:my-auto flex flex-col items-center justify-center">
-              <FifineMascot3D isTalking={isSpeakingFifine || isLoading} size="xl" />
+            <div className="relative my-1 sm:my-auto flex flex-col items-center justify-center shrink-0">
+              <FifineMascot3D isTalking={isSpeakingFifine || isLoading} size="lg" />
 
               {/* Broadcast Waves emerging from mouth when talking */}
               {isSpeakingFifine && (
-                <div className="absolute top-1/4 right-3 sm:right-6 flex flex-col items-center gap-1 pointer-events-none">
-                  <div className="w-6 h-6 rounded-full border-2 border-amber-400 animate-ping opacity-80" />
-                  <div className="w-10 h-10 rounded-full border-2 border-red-400 animate-ping opacity-60 delay-100" />
-                  <span className="text-[9px] font-black text-amber-300 tracking-wider uppercase mt-1 bg-black/75 px-2 py-0.5 rounded-full border border-amber-400/40">
-                    Voz de Fifine
-                  </span>
+                <div className="absolute top-1/4 right-2 sm:right-5 flex flex-col items-center gap-1 pointer-events-none">
+                  <div className="w-5 h-5 rounded-full border-2 border-amber-400 animate-ping opacity-80" />
+                  <div className="w-8 h-8 rounded-full border-2 border-red-400 animate-ping opacity-60 delay-100" />
                 </div>
               )}
 
               {/* Pedestal Shadow */}
-              <div className="w-48 h-5 bg-black/60 rounded-full blur-md -mt-4 shadow-2xl" />
+              <div className="w-36 h-4 bg-black/60 rounded-full blur-md -mt-3 shadow-2xl" />
             </div>
 
             {/* Live Teleprompter Quote Box */}
-            <div className="w-full z-10 bg-slate-900/90 border border-slate-800 rounded-2xl p-3 text-xs shadow-xl relative">
-              <div className="flex items-center justify-between mb-1.5 text-[11px] text-slate-400">
+            <div className="w-full z-10 bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 text-xs shadow-xl relative hidden md:block shrink-0">
+              <div className="flex items-center justify-between mb-1 text-[10px] text-slate-400">
                 <span className="font-bold text-white flex items-center gap-1">
-                  <Radio className="w-3.5 h-3.5 text-red-500" />
-                  Transmissão ao Vivo (Fifine):
+                  <Radio className="w-3 h-3 text-red-500" />
+                  No Ar (Fifine):
                 </span>
                 {isSpeakingFifine && (
                   <button
@@ -647,18 +659,40 @@ export const VirtualReporterModal: React.FC<VirtualReporterModalProps> = ({
                   </button>
                 )}
               </div>
-              <p className="text-slate-200 text-xs line-clamp-3 leading-relaxed italic font-serif">
-                "{latestAssistantMessage?.text?.slice(0, 180) || 'Olá! Estou pronto para analisar suas fotos, áudios e perguntas com rigor jornalístico!'}"
+              <p className="text-slate-200 text-[11px] line-clamp-2 leading-relaxed italic font-serif">
+                "{latestAssistantMessage?.text?.slice(0, 150) || 'Olá! Estou aqui ao seu lado pronto para responder absolutamente qualquer coisa!'}"
               </p>
             </div>
 
           </div>
 
-          {/* RIGHT: CHAT MESSAGES, MULTIMODAL INPUT (Photos & Audio) */}
-          <div className="md:col-span-7 flex flex-col h-full bg-[#080d1a]/90">
+          {/* RIGHT: CHAT MESSAGES & MULTIMODAL INPUT (Photos & Audio) */}
+          <div className="flex-1 flex flex-col h-full min-h-0 min-w-0 bg-[#080d1a]/95 relative overflow-hidden">
             
-            {/* Messages Scroll Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Scroll Navigation Floating Buttons (User requirement: subir para voltar e descer) */}
+            <div className="absolute top-2 right-4 z-20 flex items-center gap-1.5 opacity-85 hover:opacity-100 transition">
+              <button
+                type="button"
+                onClick={scrollToTop}
+                className="bg-slate-800/90 hover:bg-slate-700 text-amber-300 px-2 py-1 rounded-lg border border-slate-700 shadow text-[11px] flex items-center gap-1 cursor-pointer font-bold"
+                title="Subir para o início da conversa"
+              >
+                <ChevronUp className="w-3.5 h-3.5 text-amber-400" />
+                <span>Subir ao Topo</span>
+              </button>
+              <button
+                type="button"
+                onClick={scrollToBottom}
+                className="bg-slate-800/90 hover:bg-slate-700 text-amber-300 px-2 py-1 rounded-lg border border-slate-700 shadow text-[11px] flex items-center gap-1 cursor-pointer font-bold"
+                title="Descer para a mensagem mais recente"
+              >
+                <ChevronDown className="w-3.5 h-3.5 text-amber-400" />
+                <span>Rolar ao Fim</span>
+              </button>
+            </div>
+
+            {/* Messages Scroll Area with independent scroll */}
+            <div ref={chatScrollRef} className="flex-1 overflow-y-auto min-h-0 p-4 space-y-4 scroll-smooth">
               {messages.map((msg) => (
                 <div
                   key={msg.id}

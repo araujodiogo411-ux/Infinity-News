@@ -13,6 +13,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { CATEGORIES, FinancialQuotes } from '../types/news';
+import { subscribeToQuotes, getQuotesFromFirestore } from '../services/quotesService';
 
 interface HeaderProps {
   isAdmin: boolean;
@@ -29,6 +30,7 @@ interface HeaderProps {
   onOpenBrasiliaTour?: () => void;
   onOpenTrash?: () => void;
   trashCount?: number;
+  currentQuotes?: any;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -45,11 +47,12 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAdminQuotes,
   onOpenBrasiliaTour,
   onOpenTrash,
-  trashCount = 0
+  trashCount = 0,
+  currentQuotes
 }) => {
   const [currentDateStr, setCurrentDateStr] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
-  const [quotes, setQuotes] = useState<any>({
+  const [quotes, setQuotes] = useState<any>(currentQuotes || {
     dolar: { valueFormatted: 'R$ 5,68', pctFormatted: '+0,32%', isPositive: true },
     euro: { valueFormatted: 'R$ 6,14', pctFormatted: '+0,18%', isPositive: true },
     pib: { pointsFormatted: 'R$ 10,9 tri', pctFormatted: '+2,9% a.a.', isPositive: true },
@@ -59,14 +62,34 @@ export const Header: React.FC<HeaderProps> = ({
     updatedAt: '',
   });
 
-  // Fetch real-time live quotes (Dólar, Euro, PIB, Bitcoin, Criptomoedas)
+  // Sync prop changes
   useEffect(() => {
+    if (currentQuotes) {
+      setQuotes(currentQuotes);
+    }
+  }, [currentQuotes]);
+
+  // Fetch and subscribe to real-time live quotes (Firestore + API)
+  useEffect(() => {
+    // 1. Initial from Firestore
+    getQuotesFromFirestore().then(q => {
+      if (q) setQuotes(q);
+    }).catch(() => {});
+
+    // 2. Real-time Firestore subscription
+    const unsubscribe = subscribeToQuotes((liveQuotes) => {
+      if (liveQuotes) {
+        setQuotes(liveQuotes);
+      }
+    });
+
+    // 3. Fallback poll to API
     const fetchLiveQuotes = async () => {
       try {
         const res = await fetch('/api/financial-quotes');
         const data = await res.json();
         if (data.success && data.quotes) {
-          setQuotes(data.quotes);
+          setQuotes((prev: any) => ({ ...prev, ...data.quotes }));
         }
       } catch (err) {
         console.warn('Error fetching live quotes:', err);
@@ -74,8 +97,12 @@ export const Header: React.FC<HeaderProps> = ({
     };
 
     fetchLiveQuotes();
-    const interval = setInterval(fetchLiveQuotes, 30000); // refresh every 30s
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchLiveQuotes, 45000);
+
+    return () => {
+      clearInterval(interval);
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
