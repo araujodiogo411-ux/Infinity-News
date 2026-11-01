@@ -1,0 +1,6 @@
+{
+  "name": "Jornada News - Portal de Notícias & Redação IA",
+  "description": "Portal de notícias estilo G1 com área administrativa secreta Jornada Canva, inteligência artificial para estruturação de reportagens, narração em áudio, busca e exportação em formato de jornal para impressão.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

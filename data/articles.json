@@ -1,0 +1,154 @@
+[
+  {
+    "id": "pib-brasil-cresce-acima-esperado-2026",
+    "title": "PIB do Brasil surpreende e cresce 2,9% com impulso do setor de serviços e investimentos em inovação",
+    "subtitle": "Resultado supera projeções do mercado financeiro; agronegócio e tecnologia lideram criação de novos postos de trabalho no trimestre.",
+    "chapeu": "ECONOMIA",
+    "category": "economia",
+    "author": "Mariana Vasconcelos",
+    "authorRole": "Analista de Economia — Infinite News, Brasília",
+    "publishedAt": "2026-10-30T11:30:00.000Z",
+    "updatedAt": "2026-10-30T12:15:00.000Z",
+    "readTime": "4 min de leitura",
+    "imageUrl": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=80",
+    "imageCaption": "Movimentação financeira e expansão de infraestrutura aceleram índices de confiança econômica no país.",
+    "imageCredit": "Foto: Agência Brasil / Divulgação",
+    "paragraphs": [
+      "O Produto Interno Bruto (PIB) brasileiro avançou 2,9% no último ciclo consolidado, superando com folga o consenso de analistas de mercado, que projetavam expansão em torno de 1,8%. Os dados divulgados na manhã desta sexta-feira confirmam a resiliência da atividade produtiva nacional.",
+      "O grande motor do desempenho foi o setor terciário, especialmente os segmentos de tecnologia da informação, serviços financeiros e logística de comércio eletrônico, que registraram crescimento acumulado superior a 4,2% no mesmo intervalo.",
+      "Segundo economistas consultados, o ciclo de corte nas taxas básicas e a expansão do crédito para pequenas e médias empresas estimularam uma retomada consistente das contratações formais nas capitais e polos regionais.",
+      "Outro destaque relevante foi a balança comercial, com superávit histórico impulsionado pela exportação de produtos de valor agregado e energias renováveis, consolidando o Brasil como um dos principais destinos de investimentos sustentáveis no hemisfério sul.",
+      "Para os próximos trimestres, o Ministério da Fazenda estima que o controle inflacionário somado ao crescimento da renda média real das famílias deve manter a trajetória de expansão sustentada."
+    ],
+    "keyQuotes": [
+      "O setor de serviços e a digitalização foram determinantes para superar todas as previsões mais céticas do mercado."
+    ],
+    "tags": ["Economia", "PIB", "Mercado", "Emprego", "Finanças"],
+    "views": 1420,
+    "likes": 88,
+    "featured": true,
+    "breakingNews": false,
+    "comments": [
+      {
+        "id": "c-1",
+        "author": "Roberto Alves",
+        "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80",
+        "createdAt": "Há 2 horas",
+        "content": "Excelente notícia para o pequeno empresário. Sentimos na prática a demanda aumentar nas últimas semanas.",
+        "likes": 12
+      },
+      {
+        "id": "c-2",
+        "author": "Helena Prado",
+        "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80",
+        "createdAt": "Há 45 minutos",
+        "content": "Muito bom ver tecnologia e inovação puxando a economia do país ao lado do agronegócio.",
+        "likes": 7
+      }
+    ],
+    "sourceGrounding": [
+      {
+        "title": "IBGE - Contas Nacionais Trimestrais",
+        "url": "https://www.ibge.gov.br"
+      }
+    ]
+  },
+  {
+    "id": "inteligencia-artificial-redacoes-comunicacao-2026",
+    "title": "Nova diretriz de Inteligência Artificial impulsiona produtividade e transparência em redações e agências",
+    "subtitle": "Ferramentas que estruturam artigos e geram análises em tempo real passam a contar com selo de verificação humana e ética editorial.",
+    "chapeu": "TECNOLOGIA",
+    "category": "tecnologia",
+    "author": "Felipe Nogueira",
+    "authorRole": "Editor de Tecnologia — Infinite News, São Paulo",
+    "publishedAt": "2026-10-30T10:45:00.000Z",
+    "updatedAt": "2026-10-30T11:00:00.000Z",
+    "readTime": "3 min de leitura",
+    "imageUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+    "imageCaption": "Sistemas neurais e modelos multimodais transformam o fluxo de trabalho jornalístico sem substituir o crivo investigativo.",
+    "imageCredit": "Foto: Unsplash / Tech Journal",
+    "paragraphs": [
+      "A integração de sistemas de Inteligência Artificial generativa atingiu um novo patamar de maturidade no ecossistema de comunicação brasileira. Portais, emissoras e equipes de marketing digital adotaram fluxos híbridos capazes de transformar notas brutas em pautas estruturadas em questão de segundos.",
+      "A principal evolução está na capacidade dos modelos de identificar hierarquia de texto — separando automaticamente manchetes concisas, linhas finas de contexto, declarações de fontes e sugestões visuais — permitindo que repórteres concentrem energia na apuração e checagem de fatos.",
+      "Representantes das principais entidades de imprensa destacaram que a transparência com o leitor é a regra de ouro: 'A inteligência artificial organiza a informação com velocidade prodigiosa, mas o compromisso com a verdade e o olhar ético pertencem integralmente ao ser humano'.",
+      "Além da edição textual, a automação gráfica para versões impressas e digitais ganhou força, viabilizando que pequenos jornais locais e publicações independentes tenham diagramação refinada compatível com grandes diários mundiais."
+    ],
+    "keyQuotes": [
+      "A inteligência artificial organiza o dado com velocidade impressionante; o crivo da verdade continua sendo 100% humano."
+    ],
+    "tags": ["Tecnologia", "Inteligência Artificial", "Jornalismo", "Futuro", "Inovação"],
+    "views": 980,
+    "likes": 64,
+    "featured": false,
+    "breakingNews": true,
+    "comments": [
+      {
+        "id": "c-3",
+        "author": "Guilherme Sampaio",
+        "avatar": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=100&q=80",
+        "createdAt": "Há 1 hora",
+        "content": "A agilidade para transformar uma transcrição de coletiva em artigo pronto é um divisor de águas na redação.",
+        "likes": 9
+      }
+    ]
+  },
+  {
+    "id": "satelite-brasileiro-dados-climaticos-amazonia",
+    "title": "Satélite nacional bate recorde de monitoramento e envia dados em tempo real sobre a Amazônia",
+    "subtitle": "Tecnologia de sensoriamento óptico desenvolvida no Brasil permite flagrar alterações na cobertura vegetal em intervalo de minutos.",
+    "chapeu": "CIÊNCIA & MEIO AMBIENTE",
+    "category": "ciencia",
+    "author": "Beatriz Alencar",
+    "authorRole": "Repórter de Ciência — Infinite News, Manaus",
+    "publishedAt": "2026-10-30T09:15:00.000Z",
+    "updatedAt": "2026-10-30T09:40:00.000Z",
+    "readTime": "5 min de leitura",
+    "imageUrl": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+    "imageCaption": "Órbita polar sincronizada com o sol permite varredura detalhada de biomas brasileiros com resolução submétrica.",
+    "imageCredit": "Foto: INPE / Divulgação Científica",
+    "paragraphs": [
+      "O Instituto Nacional de Pesquisas Espaciais (INPE) celebrou nesta semana a marca de mais de 100 mil imagens de alta resolução transmitidas pelo mais recente satélite de observação terrestre construído por engenheiros brasileiros.",
+      "Equipado com câmeras multiespectrais e algoritmos de detecção de anomalias térmicas, o equipamento consegue perfurar densas camadas de nuvens e identificar focos de calor ou desmatamento incipiente com precisão quase cirúrgica.",
+      "As informações são integradas instantaneamente aos sistemas de fiscalização ambiental e compartilhadas com pesquisadores de mais de vinte universidades federais.",
+      "Segundo a coordenação do projeto, o programa espacial reafirma a soberania científica do país e serve de modelo para outras nações da bacia amazônica na proteção dos recursos hídricos e da biodiversidade."
+    ],
+    "keyQuotes": [
+      "Temos agora a capacidade de agir antes que o dano ambiental se consolide, graças ao tempo de resposta de minutos."
+    ],
+    "tags": ["Ciência", "Amazônia", "Satélite", "Sustentabilidade", "Meio Ambiente"],
+    "views": 845,
+    "likes": 112,
+    "featured": false,
+    "breakingNews": false,
+    "comments": []
+  },
+  {
+    "id": "startups-design-automacao-brasil-2026",
+    "title": "Polo de inovação visual brasileiro atrai US$ 120 milhões para soluções de design e comunicação ágil",
+    "subtitle": "Ecossistema impulsionado pela 'Jornada Canva' e ferramentas de autopublicação gera milhares de negócios criativos independentes.",
+    "chapeu": "NEGÓCIOS & DESIGN",
+    "category": "negocios",
+    "author": "Rodrigo Mendes",
+    "authorRole": "Colunista de Negócios e Startups",
+    "publishedAt": "2026-10-30T08:00:00.000Z",
+    "updatedAt": "2026-10-30T08:30:00.000Z",
+    "readTime": "3 min de leitura",
+    "imageUrl": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
+    "imageCaption": "Empreendedores e designers utilizam plataformas integradas para produzir jornais, catálogos e marcas em escala.",
+    "imageCredit": "Foto: Divulgação / Inova Brasil",
+    "paragraphs": [
+      "O mercado de economia criativa e design automatizado atingiu cifras recordes no Brasil. Rodadas de aporte recentes somaram mais de US$ 120 milhões direcionadas a empreendedores focados em democratizar a produção gráfica de alto nível.",
+      "Iniciativas educacionais como a 'Jornada Canva' prepararam uma nova geração de profissionais autônomos que combinam estética editorial com facilidade de publicação e impressão sob demanda.",
+      "Especialistas apontam que a barreira técnica para fundar veículos comunitários, jornais de bairro e boletins corporativos sofisticados praticamente desapareceu, criando oportunidades de monetização direta e fortalecendo marcas locais."
+    ],
+    "keyQuotes": [
+      "A união entre design acessível e IA editorial permitiu que qualquer comunidade crie seu próprio jornal com qualidade de diário nacional."
+    ],
+    "tags": ["Negócios", "Design", "Jornada Canva", "Startups", "Criatividade"],
+    "views": 630,
+    "likes": 53,
+    "featured": false,
+    "breakingNews": false,
+    "comments": []
+  }
+]
