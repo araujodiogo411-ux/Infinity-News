@@ -9,7 +9,9 @@ import {
   ArrowRight,
   Edit,
   Trash2,
-  ShieldAlert
+  ShieldAlert,
+  Cloud,
+  Database
 } from 'lucide-react';
 import { NewsArticle, CATEGORIES } from '../types/news';
 import { NewsGlobe3D } from './NewsGlobe3D';
@@ -160,7 +162,7 @@ export const HomeNewsFeed: React.FC<HomeNewsFeedProps> = ({
             onClick={() => onSelectArticle(featuredArticle)}
             className="group bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-xs hover:shadow-lg transition cursor-pointer flex flex-col"
           >
-            <div className="relative overflow-hidden h-72 sm:h-96">
+            <div className="relative overflow-hidden h-52 sm:h-64 md:h-72">
               <img
                 src={featuredArticle.imageUrl}
                 alt={featuredArticle.title}
@@ -168,24 +170,28 @@ export const HomeNewsFeed: React.FC<HomeNewsFeedProps> = ({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
               
-              {/* Category tag */}
-              <div className="absolute top-4 left-4 flex items-center space-x-2">
-                <span className={`text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded text-white shadow ${getCategoryBadge(featuredArticle.category)}`}>
+              {/* Category & Database status tag */}
+              <div className="absolute top-3.5 left-3.5 flex flex-wrap items-center gap-1.5">
+                <span className={`text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded text-white shadow ${getCategoryBadge(featuredArticle.category)}`}>
                   {featuredArticle.customCategory || featuredArticle.chapeu || featuredArticle.category.toUpperCase()}
                 </span>
-                <span className="bg-black/60 backdrop-blur-xs text-white text-[11px] font-medium px-2 py-1 rounded flex items-center gap-1">
+                <span className="bg-black/60 backdrop-blur-xs text-white text-[10px] font-medium px-2 py-0.5 rounded flex items-center gap-1">
                   <Clock className="w-3 h-3 text-gray-300" />
                   {formatTimeAgo(featuredArticle.publishedAt)}
                 </span>
+                <span className="bg-emerald-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow flex items-center gap-1 backdrop-blur-xs">
+                  <Cloud className="w-3 h-3 text-emerald-200" />
+                  <span>Banco Firestore Real</span>
+                </span>
               </div>
 
-              {/* Title and subtitle */}
-              <div className="absolute bottom-4 left-4 right-4 text-white space-y-2">
-                <h2 className="font-headline text-2xl sm:text-3xl md:text-4xl font-black leading-tight group-hover:text-amber-200 transition drop-shadow">
+              {/* Title and subtitle (compact & elegant size) */}
+              <div className="absolute bottom-3.5 left-3.5 right-3.5 text-white space-y-1.5">
+                <h2 className="font-headline text-lg sm:text-xl md:text-2xl font-black leading-snug group-hover:text-amber-200 transition drop-shadow line-clamp-2">
                   {featuredArticle.title}
                 </h2>
                 {featuredArticle.subtitle && (
-                  <p className="hidden sm:block text-xs sm:text-sm text-gray-200 font-serif-news italic line-clamp-2 drop-shadow">
+                  <p className="hidden sm:block text-xs text-gray-200 font-serif-news italic line-clamp-2 drop-shadow">
                     {featuredArticle.subtitle}
                   </p>
                 )}
@@ -193,11 +199,15 @@ export const HomeNewsFeed: React.FC<HomeNewsFeedProps> = ({
             </div>
 
             {/* Bottom metadata bar with Admin Controls if Admin */}
-            <div className="p-4 bg-white flex flex-wrap items-center justify-between text-xs text-gray-500 gap-2 border-t border-gray-100">
+            <div className="p-3.5 bg-white flex flex-wrap items-center justify-between text-xs text-gray-500 gap-2 border-t border-gray-100">
               <div className="flex items-center space-x-2 font-medium">
                 <span className="font-bold text-gray-900">{featuredArticle.author}</span>
                 <span>•</span>
                 <span>{featuredArticle.readTime || '3 min'}</span>
+                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  <Database className="w-3 h-3" />
+                  <span>Nuvem Conectada</span>
+                </span>
               </div>
 
               <div className="flex items-center space-x-3">

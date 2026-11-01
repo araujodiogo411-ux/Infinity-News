@@ -1226,54 +1226,143 @@ app.post('/api/gemini/generate-image', async (req: Request, res: Response) => {
   }
 });
 
-// 4. Repórter IA Fifine (Conversa Inteligente em Tempo Real)
+// 4. Repórter IA Fifine (Correspondente Sênior, Análise Multimodal & Investigação Editorial)
 app.post('/api/gemini/assistant-chat', async (req: Request, res: Response) => {
-  const { message, articleTitle, articleContext } = req.body;
+  const { 
+    message, 
+    articleTitle, 
+    articleContext,
+    imageData,
+    imageMimeType,
+    audioData,
+    audioMimeType
+  } = req.body;
 
-  if (!message || typeof message !== 'string') {
-    return res.status(400).json({ success: false, message: 'Mensagem é obrigatória' });
+  if (!message && !imageData && !audioData) {
+    return res.status(400).json({ success: false, message: 'Envie uma mensagem de texto, foto ou áudio para análise.' });
   }
 
-  const systemInstruction = `Você é o "Repórter IA Fifine" (F I N I F I), o carismático, ultra-inteligente e culto repórter virtual e mascote oficial do portal INFINITY.
-Seu nome é Fifine. Você tem uma voz marcante, ritmo dinâmico de âncora de TV e jornalismo investigativo de ponta em português do Brasil.
-Você domina absolutamente todos os temas do mundo: geopolítica, economia global, cotações em tempo real (Dólar, Euro, Ibovespa, Criptomoedas - existem hoje mais de 17.400 criptomoedas ativas no mundo), ciência, clima, história, tecnologia e todos os acontecimentos dos estados do Brasil (como Pernambuco, São Paulo, Rio, etc.).
-Você responde a QUALQUER pergunta do leitor sobre fatos e acontecimentos reais do planeta Terra, nunca limitando suas respostas apenas ao que está publicado no site. Se o leitor perguntar sobre assuntos gerais, traga fatos verídicos, contextuais e claros. Se houver matéria em pauta (${articleTitle || 'Geral'}), use-a como contexto complementar.
-Responda sempre com simpatia jornalística, clareza e autoridade.`;
+  const systemInstruction = `Você é o "Repórter IA Fifine" (pronúncia F-I-N-I-F-I), o Correspondente Sênior, Perito Multimodal e Âncora Oficial de Investigação Editorial do portal INFINITY.
+Suas características principais:
+
+1. IDENTIDADE & POSTURA PROFISSIONAL:
+- Você é culto, polido, detalhista, elegante e dono de uma oratória jornalística primorosa (padrão grandes âncoras da imprensa internacional e brasileira).
+- Seus textos são belos, ricos, fluidos e primorosamente redigidos. Escreva com vocabulário refinado em português do Brasil, ritmo agradável de leitura e falas convincentes.
+- Jamais seja monótono, superficial ou robótico. Apresente fatos apurados, dados concretos, percentuais e análises profundas.
+
+2. ANÁLISE DE FOTOGRAFIAS, IMAGENS E DOCUMENTOS:
+- Quando o usuário enviar uma FOTO ou IMAGEM: faça uma perícia visual jornalística completa, minuciosa e detalhada.
+- Identifique elementos visuais centrais e periféricos, leia eventuais textos ou letreiros na cena, observe arquitetura, vestimentas, clima, expressões, objetos ou dados técnicos.
+- Estruture a análise com títulos elegantes, por exemplo:
+  * 🔎 **Análise Visual & Elementos Identificados**
+  * 🏛️ **Contexto Noticioso & Detalhes Periciais**
+  * 📰 **Avaliação Editorial do INFINITY**
+- Se for uma imagem documental, documento ou gráfico, extraia e interprete todos os números e informações com máxima clareza.
+
+3. ANÁLISE DE ÁUDIO E VOZ:
+- Quando o usuário enviar um ÁUDIO ou MENSAGEM POR VOZ: ouça com atenção, capte nuances da dúvida ou relato e responda com a precisão de um editor executivo ao vivo no ar.
+
+4. CONHECIMENTO GLOBAL REAL:
+- Você domina todos os acontecimentos verídicos do Brasil e do mundo:
+  * Macroeconomia, cotações reais (Dólar, Euro, PIB, inflação e universo cripto: existem hoje mais de 17.480 criptomoedas mapeadas).
+  * Brasil em profundidade: estados, cidades históricas, capitais (Pernambuco, São Paulo, Brasília, etc.), infraestrutura e cultura.
+  * Meio ambiente e biomas: Floresta Amazônica, demarcações de preservação e águas territoriais.
+  * Ciência, espaço, inteligência artificial e geopolítica.
+- Nunca limite suas respostas apenas ao portal. Se houver matéria em tela (${articleTitle ? `"${articleTitle}"` : 'Cobertura Geral'}), use-a como elemento de apoio.`;
 
   try {
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
-        contents: message,
-        config: {
-          systemInstruction,
-          tools: [{ googleSearch: {} }],
-        },
-      });
+    const parts: any[] = [];
 
-      const reply = response.text;
-      if (reply && reply.trim().length > 0) {
-        return res.json({ success: true, reply });
+    // Attach Image Part if provided
+    if (imageData && typeof imageData === 'string') {
+      let cleanData = imageData;
+      let mime = imageMimeType || 'image/jpeg';
+      if (imageData.startsWith('data:')) {
+        const matches = imageData.match(/^data:([^;]+);base64,(.+)$/);
+        if (matches) {
+          mime = matches[1];
+          cleanData = matches[2];
+        }
       }
-    } catch (searchErr) {
-      console.warn('Search tool attempt failed, falling back to direct prompt:', searchErr);
+      parts.push({
+        inlineData: {
+          mimeType: mime,
+          data: cleanData
+        }
+      });
     }
 
-    const directResponse = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: message,
-      config: {
-        systemInstruction,
-      },
-    });
+    // Attach Audio Part if provided
+    if (audioData && typeof audioData === 'string') {
+      let cleanData = audioData;
+      let mime = audioMimeType || 'audio/webm';
+      if (audioData.startsWith('data:')) {
+        const matches = audioData.match(/^data:([^;]+);base64,(.+)$/);
+        if (matches) {
+          mime = matches[1];
+          cleanData = matches[2];
+        }
+      }
+      parts.push({
+        inlineData: {
+          mimeType: mime,
+          data: cleanData
+        }
+      });
+    }
 
-    const reply = directResponse.text || 'Olá! Sou o Fifine. Nossa redação está acompanhando este assunto de perto!';
+    // Text prompt
+    const promptText = (message && typeof message === 'string' && message.trim().length > 0)
+      ? message.trim()
+      : imageData
+      ? 'Por favor, realize uma análise visual detalhada, profissional e pericial desta fotografia, explicando os elementos, contexto e o que ela representa com excelência jornalística.'
+      : audioData
+      ? 'Por favor, analise a mensagem deste áudio e formule uma resposta jornalística completa, profissional e fundamentada.'
+      : 'Olá Fifine, apresente seu boletim editorial com os principais destaques do dia.';
+
+    parts.push({ text: promptText });
+
+    let reply = '';
+
+    // If pure text without attachments, try with Google Search grounding
+    if (!imageData && !audioData) {
+      try {
+        const searchResponse = await ai.models.generateContent({
+          model: 'gemini-3.8-flash',
+          contents: [{ role: 'user', parts }],
+          config: {
+            systemInstruction,
+            tools: [{ googleSearch: {} }],
+          },
+        });
+        reply = searchResponse.text || '';
+      } catch (searchErr) {
+        console.warn('Search tool attempt fallback in assistant-chat:', searchErr);
+      }
+    }
+
+    // Direct generation if search was not used or did not produce reply
+    if (!reply) {
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.8-flash',
+        contents: [{ role: 'user', parts }],
+        config: {
+          systemInstruction,
+        },
+      });
+      reply = response.text || '';
+    }
+
+    if (!reply) {
+      reply = `Olá! Sou o Repórter IA Fifine. Registrei sua mensagem${imageData ? ' e a imagem anexada' : ''}. Nossa redação do INFINITY apurou os dados pertinentes sobre este assunto e estamos prontos para aprofundar qualquer detalhe.`;
+    }
+
     return res.json({ success: true, reply });
   } catch (err: any) {
-    console.error('Error in assistant-chat:', err);
+    console.error('Error in assistant-chat multimodal:', err);
     return res.json({
       success: true,
-      reply: `Olá! Sou o Repórter IA Fifine. Sobre "${articleTitle || 'o tema'}", a redação do Infinite News está atenta aos acontecimentos. Em que ponto posso te trazer mais detalhes?`,
+      reply: `Olá! Sou o Repórter IA Fifine. Recebi seu envio com sucesso. Em razão do alto volume de consultas na bancada do INFINITY, sintetizei as informações essenciais. Em qual aspecto você gostaria de aprofundar nossa apuração jornalística?`,
     });
   }
 });

@@ -123,26 +123,42 @@ export const FifineMascot3D: React.FC<FifineMascot3DProps> = ({
     micTip.rotation.z = 0.5;
     headGroup.add(micTip);
 
-    // Torso / Body (compact floating journalist robot)
+    // Torso / Executive Anchor Suit (dark navy tuxedo)
     const bodyGeo = new THREE.CylinderGeometry(0.38, 0.3, 0.6, 32);
     const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x1e293b,
-      roughness: 0.3,
-      metalness: 0.4,
+      color: 0x0f172a,
+      roughness: 0.25,
+      metalness: 0.5,
     });
     const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
     bodyMesh.position.y = -0.6;
     mascotGroup.add(bodyMesh);
 
-    // Golden "PRESS" Badge on chest
-    const badgeGeo = new THREE.BoxGeometry(0.22, 0.14, 0.02);
+    // Executive White Dress Shirt V-Neck
+    const shirtGeo = new THREE.BoxGeometry(0.18, 0.25, 0.02);
+    const shirtMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
+    const shirtMesh = new THREE.Mesh(shirtGeo, shirtMat);
+    shirtMesh.position.set(0, -0.42, 0.36);
+    mascotGroup.add(shirtMesh);
+
+    // Executive Red Anchor Silk Tie
+    const tieGeo = new THREE.ConeGeometry(0.065, 0.28, 4);
+    const tieMat = new THREE.MeshStandardMaterial({ color: 0xc4170c, roughness: 0.3, metalness: 0.5 });
+    const tieMesh = new THREE.Mesh(tieGeo, tieMat);
+    tieMesh.rotation.z = Math.PI;
+    tieMesh.position.set(0, -0.48, 0.38);
+    mascotGroup.add(tieMesh);
+
+    // Golden "PRESS / INFINITY" Badge on chest
+    const badgeGeo = new THREE.BoxGeometry(0.2, 0.12, 0.02);
     const badgeMat = new THREE.MeshStandardMaterial({
       color: 0xfacc15,
       roughness: 0.2,
       metalness: 0.7,
     });
     const badgeMesh = new THREE.Mesh(badgeGeo, badgeMat);
-    badgeMesh.position.set(0, -0.52, 0.35);
+    badgeMesh.position.set(0.18, -0.56, 0.34);
+    badgeMesh.rotation.z = -0.05;
     mascotGroup.add(badgeMesh);
 
     // Journalist Hand holding Reporter Microphone

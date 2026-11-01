@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "Article": {
+      "title": "Article",
+      "description": "Reportagem ou notícia publicada no portal INFINITY",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "chapeu": { "type": "string" },
+        "category": { "type": "string" },
+        "customCategory": { "type": "string" },
+        "author": { "type": "string" },
+        "authorRole": { "type": "string" },
+        "publishedAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "readTime": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "imageCaption": { "type": "string" },
+        "imageCredit": { "type": "string" },
+        "paragraphs": { "type": "array" },
+        "blocks": { "type": "array" },
+        "keyQuotes": { "type": "array" },
+        "tags": { "type": "array" },
+        "views": { "type": "number" },
+        "likes": { "type": "number" },
+        "featured": { "type": "boolean" },
+        "breakingNews": { "type": "boolean" },
+        "comments": { "type": "array" },
+        "isDeleted": { "type": "boolean" },
+        "deletedAt": { "type": "string" },
+        "newspaperEdition": { "type": "string" },
+        "newspaperYear": { "type": "string" },
+        "newspaperIssue": { "type": "string" },
+        "newspaperPrice": { "type": "string" },
+        "newspaperSection": { "type": "string" }
+      },
+      "required": ["id", "title"]
+    },
+    "FinancialQuotes": {
+      "title": "FinancialQuotes",
+      "description": "Cotações de moedas, PIB e criptomoedas em tempo real",
+      "type": "object",
+      "properties": {
+        "dolar": { "type": "object" },
+        "euro": { "type": "object" },
+        "pib": { "type": "object" },
+        "bitcoin": { "type": "object" },
+        "cryptoGlobal": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "BrasiliaPhoto": {
+      "title": "BrasiliaPhoto",
+      "description": "Foto diária e mensal dos monumentos e ruas de Brasília",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "date": { "type": "string" },
+        "caption": { "type": "string" },
+        "photographer": { "type": "string" }
+      },
+      "required": ["id", "title", "imageUrl"]
+    }
+  },
+  "firestore": {
+    "/articles/{articleId}": {
+      "schema": { "$ref": "#/entities/Article" },
+      "description": "Coleção de matérias jornalísticas do portal INFINITY"
+    },
+    "/quotes/{quoteId}": {
+      "schema": { "$ref": "#/entities/FinancialQuotes" },
+      "description": "Cotações e indicadores financeiros em tempo real"
+    },
+    "/brasilia_photos/{photoId}": {
+      "schema": { "$ref": "#/entities/BrasiliaPhoto" },
+      "description": "Fotos históricas e diárias de Brasília para o tour"
+    }
+  }
+}

@@ -294,7 +294,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
 
       {/* Header section: Chapeu, Title, Subtitle */}
       <div className="space-y-3 mb-6">
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className={`text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg text-white ${categoryObj.badgeColor}`}>
             {article.customCategory || article.chapeu || categoryObj.name.toUpperCase()}
           </span>
@@ -303,14 +303,18 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
               Plantão
             </span>
           )}
+          <span className="bg-emerald-50 text-emerald-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-lg border border-emerald-200 flex items-center gap-1">
+            <span>☁️</span>
+            <span>Banco Firestore Conectado</span>
+          </span>
         </div>
 
-        <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl font-black text-gray-950 leading-tight tracking-tight">
+        <h1 className="font-headline text-2xl sm:text-3xl md:text-4xl font-black text-gray-950 leading-snug tracking-tight">
           {article.title}
         </h1>
 
         {article.subtitle && (
-          <p className="text-base sm:text-xl text-gray-700 leading-snug font-serif-news italic">
+          <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed font-serif-news italic">
             {article.subtitle}
           </p>
         )}

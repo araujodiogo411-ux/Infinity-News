@@ -11,6 +11,16 @@ import { Newspaper } from 'lucide-react';
 import { AdminQuotesModal } from './components/AdminQuotesModal';
 import { BrasiliaStreetTourModal } from './components/BrasiliaStreetTourModal';
 import { TrashModal } from './components/TrashModal';
+import { 
+  subscribeToArticles, 
+  getActiveArticles, 
+  getTrashArticles, 
+  saveArticleToFirestore, 
+  moveArticleToTrashInFirestore, 
+  restoreArticleInFirestore, 
+  permanentDeleteInFirestore,
+  seedFirestoreIfEmpty 
+} from './services/articleService';
 
 export default function App() {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
@@ -100,10 +110,58 @@ export default function App() {
   };
 
   useEffect(() => {
+    // 1. Seed Cloud Firestore with initial curated articles if collection is fresh
+    seedFirestoreIfEmpty().catch(err => console.warn('Firestore initial check:', err));
+
+    // 2. Attach real-time Firestore listener for live cloud updates
+    const unsubscribe = subscribeToArticles(
+      (liveArticles) => {
+        if (Array.isArray(liveArticles) && liveArticles.length > 0) {
+          // If a category is selected or search query is typed, filter accordingly
+          let filtered = liveArticles;
+          if (selectedCategory && selectedCategory !== 'todos') {
+            const catLower = selectedCategory.toLowerCase();
+            filtered = filtered.filter(a => 
+              a.category?.toLowerCase() === catLower ||
+              a.customCategory?.toLowerCase() === catLower
+            );
+          }
+          if (searchQuery.trim()) {
+            const q = searchQuery.trim().toLowerCase();
+            filtered = filtered.filter(a => 
+              a.title?.toLowerCase().includes(q) ||
+              a.subtitle?.toLowerCase().includes(q) ||
+              a.author?.toLowerCase().includes(q) ||
+              a.tags?.some((t: string) => t.toLowerCase().includes(q))
+            );
+          }
+          setArticles(filtered);
+          setLoading(false);
+
+          if (currentArticle) {
+            const fresh = liveArticles.find((a: NewsArticle) => a.id === currentArticle.id);
+            if (fresh) setCurrentArticle(fresh);
+          }
+        }
+      },
+      (liveTrash) => {
+        if (Array.isArray(liveTrash)) {
+          setTrashArticles(liveTrash);
+        }
+      }
+    );
+
+    // 3. Also fetch from backend as fallback sync
     fetchArticles();
     if (isAdmin) {
       fetchTrashArticles();
     }
+
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
   }, [selectedCategory, searchQuery, isAdmin]);
 
   // Admin Handlers
@@ -122,7 +180,14 @@ export default function App() {
   };
 
   // When a new article is published or edited from Admin Studio
-  const handleArticlePublished = (articleData: NewsArticle) => {
+  const handleArticlePublished = async (articleData: NewsArticle) => {
+    // 1. Save directly to Cloud Firestore Database
+    try {
+      await saveArticleToFirestore(articleData);
+    } catch (fsErr) {
+      console.warn('Sync to Firestore:', fsErr);
+    }
+
     setArticles(prev => {
       const exists = prev.some(a => a.id === articleData.id);
       if (exists) {
@@ -134,73 +199,65 @@ export default function App() {
     setEditingArticle(null);
   };
 
-  // Delete article handler (Moves to trash)
+  // Delete article handler (Moves to trash in Cloud Firestore)
   const handleDeleteArticle = async (articleId: string) => {
     try {
-      const res = await fetch(`/api/articles/${articleId}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        // Remove from published articles
-        setArticles(prev => {
-          const target = prev.find(a => a.id === articleId);
-          if (target) {
-            const trashed = data.article || { ...target, isDeleted: true, deletedAt: new Date().toISOString() };
-            setTrashArticles(oldTrash => [trashed, ...oldTrash.filter(t => t.id !== articleId)]);
-          }
-          return prev.filter(a => a.id !== articleId);
-        });
+      // Move to trash in Cloud Firestore
+      await moveArticleToTrashInFirestore(articleId);
 
-        if (currentArticle?.id === articleId) {
-          setCurrentArticle(null);
+      // Remove from published articles locally immediately
+      setArticles(prev => {
+        const target = prev.find(a => a.id === articleId);
+        if (target) {
+          const trashed: NewsArticle = { ...target, isDeleted: true, deletedAt: new Date().toISOString() };
+          setTrashArticles(oldTrash => [trashed, ...oldTrash.filter(t => t.id !== articleId)]);
         }
+        return prev.filter(a => a.id !== articleId);
+      });
+
+      if (currentArticle?.id === articleId) {
+        setCurrentArticle(null);
       }
     } catch (e) {
-      console.error('Error deleting article:', e);
+      console.error('Error deleting article in Firestore:', e);
     }
   };
 
-  // Restore article from trash back to portal
+  // Restore article from trash back to portal in Cloud Firestore
   const handleRestoreArticle = async (articleId: string) => {
     try {
-      const res = await fetch(`/api/articles/${articleId}/restore`, { method: 'POST' });
-      const data = await res.json();
-      if (data.success) {
-        const restored = data.article;
-        setTrashArticles(prev => prev.filter(a => a.id !== articleId));
-        if (restored) {
-          setArticles(prev => [restored, ...prev.filter(a => a.id !== articleId)]);
-        } else {
-          fetchArticles();
-        }
-      }
+      // Restore in Cloud Firestore
+      await restoreArticleInFirestore(articleId);
+
+      setTrashArticles(prev => prev.filter(a => a.id !== articleId));
+      fetchArticles();
     } catch (e) {
-      console.error('Error restoring article:', e);
+      console.error('Error restoring article in Firestore:', e);
     }
   };
 
-  // Permanently delete article from trash
+  // Permanently delete article from trash in Cloud Firestore
   const handlePermanentDeleteArticle = async (articleId: string) => {
     try {
-      const res = await fetch(`/api/articles/${articleId}?permanent=true`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setTrashArticles(prev => prev.filter(a => a.id !== articleId));
-      }
+      // Permanently remove document from Cloud Firestore
+      await permanentDeleteInFirestore(articleId);
+
+      setTrashArticles(prev => prev.filter(a => a.id !== articleId));
     } catch (e) {
-      console.error('Error permanently deleting article:', e);
+      console.error('Error permanently deleting article in Firestore:', e);
     }
   };
 
   // Empty all trash
   const handleEmptyTrash = async () => {
     try {
-      const res = await fetch('/api/articles-trash/empty', { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setTrashArticles([]);
+      for (const item of trashArticles) {
+        await permanentDeleteInFirestore(item.id);
       }
+      setTrashArticles([]);
+      await fetch('/api/articles-trash/empty', { method: 'DELETE' });
     } catch (e) {
-      console.error('Error emptying trash:', e);
+      console.error('Error emptying trash in Firestore:', e);
     }
   };
 

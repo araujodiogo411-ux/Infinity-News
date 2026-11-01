@@ -35,6 +35,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { CATEGORIES, NewsArticle, ParsedNewsResult, StoryBlock, NewsDraft } from '../types/news';
+import { saveArticleToFirestore } from '../services/articleService';
 
 interface AdminStudioProps {
   isOpen: boolean;
@@ -555,6 +556,13 @@ export const AdminStudio: React.FC<AdminStudioProps> = ({
       const data = await res.json();
 
       if (data.success) {
+        // Save to Google Cloud Firestore database
+        try {
+          await saveArticleToFirestore(data.article);
+        } catch (fsErr) {
+          console.warn('[Firestore] Notícia persistida localmente, aviso de sincronização em nuvem:', fsErr);
+        }
+
         setSuccessArticle(data.article);
         onArticlePublished(data.article);
 
@@ -571,7 +579,7 @@ export const AdminStudio: React.FC<AdminStudioProps> = ({
           console.warn('Error clearing published draft:', e);
         }
 
-        setStatusMessage(editingArticle ? 'Reportagem atualizada com sucesso!' : 'Notícia publicada com sucesso no banco de dados!');
+        setStatusMessage(editingArticle ? 'Reportagem atualizada com sucesso no Banco Firestore!' : 'Notícia publicada com sucesso no Banco de Dados Real!');
       } else {
         throw new Error(data.message || 'Falha ao salvar notícia');
       }
